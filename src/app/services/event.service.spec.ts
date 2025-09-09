@@ -11,7 +11,7 @@ describe('EventService', () => {
     title: 'Meeting',
     date: '2025-09-09',
     category: 'Work',
-    color: 'Blue',
+    color: '#2196f3',
     description: 'Sample event'
   };
 

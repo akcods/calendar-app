@@ -1,1 +1,31 @@
-<p>event-modal works!</p>
+<div class="modal-backdrop" (click)="closeModal()"></div>
+<div class="modal-content">
+    <h3>Add Event for {{ selectedDate }}</h3>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        <input formControlName="title" placeholder="Event Title" />
+        <textarea formControlName="description" placeholder="Description (optional)"></textarea>
+
+        <label>Category:</label>
+        <select formControlName="category">
+            <option *ngFor="let category of categories" [value]="category.name">
+                {{ category.name | titlecase }}
+            </option>
+        </select>
+
+        <div class="actions">
+            <button type="submit" [disabled]="form.invalid">Save</button>
+            <button type="button" (click)="closeModal()">Cancel</button>
+        </div>
+    </form>
+
+    <div class="existing" *ngIf="existingEvents.length">
+        <h4>Existing Events</h4>
+        <ul>
+            <li *ngFor="let e of existingEvents" [style.borderColor]="e.color">
+                <strong>{{ e.title }}</strong> ({{ e.category }})
+                <button (click)="onDelete(e.id)">Delete</button>
+            </li>
+        </ul>
+    </div>
+</div>

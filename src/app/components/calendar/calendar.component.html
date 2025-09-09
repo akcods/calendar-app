@@ -4,7 +4,7 @@
         <div class="middle-header">
             <button (click)="prevMonth()" class="arrow">‹</button>
             <div class="month-label">{{ currentDate | date: 'MMMM yyyy' }}</div>
-            <button (click)="nextMonth()" class="arrow">›</button>  
+            <button (click)="nextMonth()" class="arrow">›</button>
         </div>
     </div>
 </div>
@@ -18,6 +18,18 @@
         <div class="day-cell" *ngFor="let day of week" [class.other-month]="!day.isCurrentMonth"
             [class.today]="day.isToday" (click)="onDateClick(day.date)">
             <div class="day-number">{{ day.date.getDate() }} </div>
+
+            <!-- show upto 2 events -->
+            <div class="event" *ngFor="let event of day.events | slice:0:2" [style.backgroundColor]="event.color"
+                (click)="$event.stopPropagation(); onDateClick(day.date)">{{event.title}}</div>
+
+            <!-- show "+X more" if more than 2 events -->
+            <div class="more-events" *ngIf="day.events.length > 2"
+                (click)="$event.stopPropagation(); onDateClick(day.date)">+{{day.events.length - 2}}</div>
         </div>
     </ng-container>
 </div>
+
+<app-event-modal *ngIf="showModal" [selectedDate]="selectedDate!" [existingEvents]="modalEvents"
+    (close)="onModalClose()" (save)="onEventSave($event)" (delete)="onEventDelete($event)">
+</app-event-modal>

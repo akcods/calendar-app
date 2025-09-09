@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { CalendarGrid, DAYS } from '../../models/constants';
+import { CalendarEvent, CalendarGrid, DAYS } from '../../models/constants';
+import { EventService } from '../../services/event.service';
+import { EventModalComponent } from "../event-modal/event-modal.component";
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EventModalComponent],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss'
 })
@@ -15,8 +17,11 @@ export class CalendarComponent {
   weeks: CalendarGrid[][] = [];
   Days: string[] = DAYS;
   selectedDate: string | null = null;
+  
+  modalEvents: CalendarEvent[] = [];
+  showModal = false;
 
-  constructor() { }
+  constructor(private eventService: EventService) { }
 
   ngOnInit() {
     this.generateCalendar();
@@ -68,10 +73,14 @@ export class CalendarComponent {
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear();
 
+      const formattedDate = this.getFormattedDate(date);
+      const events: CalendarEvent[] = this.eventService.getEventsByDate(formattedDate);
+
     return {
       date,
       isCurrentMonth,
       isToday,
+      events
     };
   }
 
@@ -91,6 +100,29 @@ export class CalendarComponent {
   }
 
   onDateClick(date: Date) {
-    console.log('Date grid clicked', date);
+    this.selectedDate = this.getFormattedDate(date);
+    this.modalEvents = this.eventService.getEventsByDate(this.selectedDate);
+    this.showModal = true;
+  }
+
+  onModalClose() {
+    this.showModal = false;
+  }
+
+  onEventSave(event: CalendarEvent) {
+    this.eventService.addEvent(event);
+    this.onModalClose();
+    this.generateCalendar(); // Refresh view
+  }
+
+  onEventDelete(id: string) {
+    this.eventService.deleteEvent(id);
+    this.modalEvents = this.modalEvents.filter(e => e.id !== id);
+    this.generateCalendar();
+  }
+
+  private getFormattedDate(date: Date) {
+    const DatePadStartLength = 2;
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(DatePadStartLength, '0')}-${date.getDate().toString().padStart(DatePadStartLength, '0')}`;
   }
 }
