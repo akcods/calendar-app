@@ -1,1 +1,23 @@
-<p>calendar works!</p>
+<div class="calendar-header-wrapper">
+    <div class="calendar-header">
+        <button (click)="navigateToToday()" class="today-btn">Today</button>
+        <div class="middle-header">
+            <button (click)="prevMonth()" class="arrow">‹</button>
+            <div class="month-label">{{ currentDate | date: 'MMMM yyyy' }}</div>
+            <button (click)="nextMonth()" class="arrow">›</button>  
+        </div>
+    </div>
+</div>
+
+<div class="calendar-grid">
+    <div class="day-name" *ngFor="let day of Days">
+        {{ day }}
+    </div>
+
+    <ng-container *ngFor="let week of weeks">
+        <div class="day-cell" *ngFor="let day of week" [class.other-month]="!day.isCurrentMonth"
+            [class.today]="day.isToday" (click)="onDateClick(day.date)">
+            <div class="day-number">{{ day.date.getDate() }} </div>
+        </div>
+    </ng-container>
+</div>

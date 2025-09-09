@@ -1,0 +1,97 @@
+@use "../../../palette.scss" as *;
+
+.calendar-header-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+
+    .calendar-header {
+        display: flex;
+        gap: 2rem;
+
+        .today-btn {
+            color: black;
+            border: 2px solid $azure-radiance;
+            border-radius: 32px;
+            padding: 16px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: x-large;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+
+            &:hover {
+                background-color: $onahau;
+            }
+        }
+
+        .middle-header {
+            gap: 2rem;
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            .arrow {
+                font-size: xx-large;
+                padding: 1rem;
+
+                &:hover {
+                    color: $azure-radiance;
+                }
+            }
+
+        }
+
+        .month-label {
+            width: 12rem;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    }
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+
+    .day-name {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .day-cell {
+        display: flex;
+        flex-direction: column;
+        min-height: 80px;
+        text-align: center;
+        padding: 5px;
+        border: 1px solid $silver;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background-color: $gallery;
+        }
+
+        &.today {
+            background-color: $onahau;
+            border: 2px solid $azure-radiance;
+        }
+
+        &.other-month {
+            color: $silver-chalice;
+            background-color: $albaster;
+        }
+    }
+}
