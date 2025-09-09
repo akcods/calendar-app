@@ -5,3 +5,15 @@ export interface CalendarGrid {
   isCurrentMonth: boolean;
   isToday: boolean;
 }
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: string; // format: 'YYYY-MM-DD'
+  category: EventCategory;
+  color: EventCategoryColor;
+}
+
+type EventCategory = 'Work' | 'Personal' | 'Important';
+type EventCategoryColor = 'Blue' | 'Green' | 'Red';
