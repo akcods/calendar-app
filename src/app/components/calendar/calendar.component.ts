@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { CalendarEvent, CalendarGrid, DAYS, ModalMode } from '../../models/constants';
 import { EventService } from '../../services/event.service';
 import { EventModalComponent } from "../event-modal/event-modal.component";
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-calendar',
@@ -22,8 +23,19 @@ export class CalendarComponent {
   modalMode: ModalMode = ModalMode.Create;
   showModal = false;
   selectedEvent: CalendarEvent | undefined = undefined;
+  searchResults: CalendarEvent[] = [];
 
-  constructor(private eventService: EventService) { }
+  private searchQuerySubject: Subject<string> = new Subject<string>();
+
+  constructor(public eventService: EventService) {
+    this.searchQuerySubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe(searchValue => {
+      if (searchValue.trim().length > 0) {
+        this.searchResults = this.filterEvents(searchValue);
+      } else {
+        this.searchResults = [];
+      }
+    });
+  }
 
   ngOnInit() {
     this.generateCalendar();
@@ -108,6 +120,11 @@ export class CalendarComponent {
     this.showModal = true;
   }
 
+  onSearch(event: Event) {
+    const searchQuery = (event.target as HTMLInputElement).value;
+    this.searchQuerySubject.next(searchQuery);
+  }
+
   onModalClose() {
     this.showModal = false;
   }
@@ -123,7 +140,7 @@ export class CalendarComponent {
     this.onModalClose();
     this.generateCalendar();
   }
-  
+
   onEventDelete(id: string) {
     this.eventService.deleteEvent(id);
     this.modalEvents = this.modalEvents.filter(e => e.id !== id);
@@ -146,6 +163,19 @@ export class CalendarComponent {
     this.modalMode = ModalMode.List;
     this.showModal = true;
   }
+
+  private filterEvents = (query: string): CalendarEvent[] => {
+    if (!query || query.trim().length === 0) {
+      return [];
+    }
+
+    const lowerQuery = query.toLowerCase();
+    return this.eventService.events.filter(e =>
+      e.title.toLowerCase().includes(lowerQuery) ||
+      e.description?.toLowerCase().includes(lowerQuery) ||
+      e.category.toLowerCase().includes(lowerQuery)
+    );
+  };
 
   private getFormattedDate(date: Date) {
     const DatePadStartLength = 2;

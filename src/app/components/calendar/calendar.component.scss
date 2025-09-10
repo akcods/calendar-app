@@ -57,7 +57,73 @@
             cursor: pointer;
         }
     }
+
+    .search-container {
+        align-content: center;
+        position: relative;
+        left: 4rem;
+        min-width: 240px;
+
+        .calendar-search {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+
+            input {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+            }
+
+            .search-results {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+                max-height: 250px;
+                overflow-y: auto;
+                margin-top: 4px;
+                padding: 8px;
+
+                h4 {
+                    margin: 0 0 8px 0;
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: #444;
+                }
+
+                ul {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+
+                    li {
+                        padding: 6px;
+                        cursor: pointer;
+                        border-radius: 4px;
+
+                        &:hover {
+                            background: #f5f5f5;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
 }
+
+
 
 .calendar-grid {
     display: grid;
@@ -101,13 +167,13 @@
             &:hover {
                 color: black;
             }
-            
+
             &.more-events {
                 color: $emperor;
                 background-color: $pink-swan;
             }
         }
-        
+
 
         &:hover {
             background-color: $gallery;

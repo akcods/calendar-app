@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { CalendarEvent } from '../models/constants';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { CalendarEvent } from '../models/constants';
 export class EventService {
   private readonly _localStorage = localStorage;
   private readonly eventsSubject = new BehaviorSubject<CalendarEvent[]>([]);
-  private readonly localStorageKey : string = 'calendar_events';
+  private readonly localStorageKey: string = 'calendar_events';
 
   events$ = this.eventsSubject.asObservable();
 

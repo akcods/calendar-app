@@ -7,6 +7,21 @@
             <button (click)="nextMonth()" class="arrow">›</button>
         </div>
     </div>
+    <div class="search-container">
+        <div class="calendar-search">
+            <input type="text" placeholder="Search events..." (input)="onSearch($event)" />
+            <div *ngIf="searchResults.length > 0" class="search-results">
+                <h4>Search Results</h4>
+                <ul>
+                    <li *ngFor="let event of searchResults" (click)="onEventClick(event)">
+                        <span [style.color]="event.color">{{ event.title }}</span>
+                        ({{ event.category }}) - {{ event.date }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <div class="calendar-grid">
