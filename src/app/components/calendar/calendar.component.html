@@ -21,11 +21,11 @@
 
             <!-- show upto 2 events -->
             <div class="event" *ngFor="let event of day.events | slice:0:2" [style.backgroundColor]="event.color"
-                (click)="$event.stopPropagation(); onDateClick(day.date)">{{event.title}}</div>
+                (click)="$event.stopPropagation(); onEventClick(event)">{{event.title}}</div>
 
             <!-- show "+X more" if more than 2 events -->
-            <div class="more-events" *ngIf="day.events.length > 2"
-                (click)="$event.stopPropagation(); onDateClick(day.date)">+{{day.events.length - 2}}</div>
+            <div class="more-events event" *ngIf="day.events.length > 2"
+                (click)="$event.stopPropagation(); onMoreEventsClick(day.date)">+{{day.events.length - 2}}</div>
         </div>
     </ng-container>
 </div>

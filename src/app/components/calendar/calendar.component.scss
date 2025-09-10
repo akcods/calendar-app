@@ -72,10 +72,11 @@
     .day-cell {
         display: flex;
         flex-direction: column;
-        min-height: 80px;
+        min-height: 96px;
         text-align: center;
         padding: 5px;
         border: 1px solid $silver;
+        border-radius: 6px;
         cursor: pointer;
         position: relative;
         transition: background 0.2s ease;
@@ -86,22 +87,23 @@
         }
 
         .event {
-            font-size: 0.75rem;
+            min-height: 1.25rem;
+            font-size: 0.9rem;
             color: white;
             padding: 2px 4px;
-            margin-bottom: 2px;
+            align-content: center;
+            margin-bottom: 4px;
             border-radius: 3px;
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
+            
+            &.more-events {
+                color: $emperor;
+                background-color: $pink-swan;
+            }
         }
-
-        .more-events {
-            font-size: 0.75rem;
-            color: #555;
-            cursor: pointer;
-        }
+        
 
         &:hover {
             background-color: $gallery;

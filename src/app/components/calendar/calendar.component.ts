@@ -17,7 +17,7 @@ export class CalendarComponent {
   weeks: CalendarGrid[][] = [];
   Days: string[] = DAYS;
   selectedDate: string | null = null;
-  
+
   modalEvents: CalendarEvent[] = [];
   showModal = false;
 
@@ -73,8 +73,8 @@ export class CalendarComponent {
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear();
 
-      const formattedDate = this.getFormattedDate(date);
-      const events: CalendarEvent[] = this.eventService.getEventsByDate(formattedDate);
+    const formattedDate = this.getFormattedDate(date);
+    const events: CalendarEvent[] = this.eventService.getEventsByDate(formattedDate);
 
     return {
       date,
@@ -121,8 +121,15 @@ export class CalendarComponent {
     this.generateCalendar();
   }
 
+  onMoreEventsClick(arg0: Date) {
+    throw new Error('Method not implemented.');
+  }
+  onEventClick(_t24: CalendarEvent) {
+    throw new Error('Method not implemented.');
+  }
+
   private getFormattedDate(date: Date) {
     const DatePadStartLength = 2;
-    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(DatePadStartLength, '0')}-${date.getDate().toString().padStart(DatePadStartLength, '0')}`;
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(DatePadStartLength, '0')}-${date.getDate().toString().padStart(DatePadStartLength, '0')}`;
   }
 }
