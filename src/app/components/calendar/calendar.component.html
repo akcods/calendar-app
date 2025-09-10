@@ -30,6 +30,7 @@
     </ng-container>
 </div>
 
-<app-event-modal *ngIf="showModal" [selectedDate]="selectedDate!" [existingEvents]="modalEvents"
-    (close)="onModalClose()" (save)="onEventSave($event)" (delete)="onEventDelete($event)">
+<app-event-modal *ngIf="showModal" [selectedDate]="selectedDate!" [mode]="modalMode" [selectedEvent]="selectedEvent"
+    [existingEvents]="modalEvents" (close)="onModalClose()" (save)="onEventSave($event)"
+    (delete)="onEventDelete($event)" (update)="onEventUpdate($event)">
 </app-event-modal>

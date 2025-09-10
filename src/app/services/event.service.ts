@@ -33,16 +33,16 @@ export class EventService {
   }
 
   updateEvent(updated: CalendarEvent) {
-    const events = this.events.map(e => e.id === updated.id ? updated : e);
+    const events = this.events.map(event => event.id === updated.id ? updated : event);
     this.update(events);
   }
 
   deleteEvent(id: string) {
-    const events = this.events.filter(e => e.id !== id);
+    const events = this.events.filter(event => event.id !== id);
     this.update(events);
   }
 
   getEventsByDate(date: string): CalendarEvent[] {
-    return this.events.filter(e => e.date === date);
+    return this.events.filter(event => event.date === date);
   }
 }

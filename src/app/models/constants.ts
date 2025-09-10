@@ -1,12 +1,10 @@
 export const DAYS: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
-
 export interface CalendarGrid {
   date: Date;
   isCurrentMonth: boolean;
   isToday: boolean;
   events: CalendarEvent[];
 }
-
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -25,8 +23,14 @@ export const EVENT_CATEGORIES = {
 export type EventCategory = keyof typeof EVENT_CATEGORIES;
 export type EventCategoryColor = typeof EVENT_CATEGORIES[EventCategory];
 
-// Generate the categories array dynamically
 export const Categories = Object.entries(EVENT_CATEGORIES).map(([name, color]) => ({
   name: name as EventCategory,
   color: color as EventCategoryColor,
 }));
+
+export enum ModalMode {
+  Create = 'create',
+  View = 'view',
+  Update = 'update',
+  List = 'list'
+}

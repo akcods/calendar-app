@@ -1,31 +1,55 @@
 <div class="modal-backdrop" (click)="closeModal()"></div>
-<div class="modal-content">
-    <h3>Add Event for {{ selectedDate }}</h3>
+<div class="modal">
+    <button class="close" (click)="closeModal()">✖</button>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <input formControlName="title" placeholder="Event Title" />
-        <textarea formControlName="description" placeholder="Description (optional)"></textarea>
+    <ng-container *ngIf="mode === modalMode.Create || mode === modalMode.Update">
+        <h3>Add Event for {{ selectedDate }}</h3>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <input formControlName="title" placeholder="Event Title" />
+            <textarea formControlName="description" placeholder="Description (optional)"></textarea>
 
-        <label>Category:</label>
-        <select formControlName="category">
-            <option *ngFor="let category of categories" [value]="category.name">
-                {{ category.name | titlecase }}
-            </option>
-        </select>
+            <label>Category:</label>
+            <select formControlName="category">
+                <option *ngFor="let category of categories" [value]="category.name">
+                    {{ category.name | titlecase }}
+                </option>
+            </select>
 
-        <div class="actions">
-            <button type="submit" [disabled]="form.invalid">Save</button>
-            <button type="button" (click)="closeModal()">Cancel</button>
+            <div class="actions">
+                <button *ngIf="mode === modalMode.Create; else updateBtn" type="submit" class="primary"
+                    [disabled]="form.invalid">Save</button>
+                <ng-template #updateBtn>
+                    <button class="primary" [disabled]="form.invalid" (click)="updateEvent()">Update</button>
+                </ng-template>
+                <button type="button" class="secondary" (click)="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </ng-container>
+
+    <ng-container *ngIf="mode === modalMode.View && selectedEvent">
+        <div class="title-wrapper">
+            <div class="category-color-strip" [style.backgroundColor]="selectedEvent.color"></div>
+            <h3>{{ selectedEvent.title }}</h3>
         </div>
-    </form>
+        <p><strong>Date:</strong> {{ selectedEvent.date }}</p>
+        <p><strong>Category:</strong> {{ selectedEvent.category }}</p>
+        <p *ngIf="selectedEvent.description"><strong>Description:</strong> {{ selectedEvent.description }}</p>
 
-    <div class="existing" *ngIf="existingEvents.length">
-        <h4>Existing Events</h4>
+        <div class="actions-view">
+            <button class="primary edit-btn" (click)="editEvent(selectedEvent)">Edit</button>
+            <button class="danger" (click)="onDelete(selectedEvent.id)">Delete</button>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="mode === modalMode.List && existingEvents.length">
+        <h3>Events on {{ selectedDate }}</h3>
         <ul>
-            <li *ngFor="let e of existingEvents" [style.borderColor]="e.color">
-                <strong>{{ e.title }}</strong> ({{ e.category }})
-                <button (click)="onDelete(e.id)">Delete</button>
+            <li *ngFor="let event of existingEvents" (click)="openEvent(event)">
+                <span [style.color]="event.color">{{ event.title }}</span> ({{ event.category }})
             </li>
         </ul>
-    </div>
+        <div class="actions">
+            <button class="secondary" (click)="closeModal()">Close</button>
+        </div>
+    </ng-container>
 </div>

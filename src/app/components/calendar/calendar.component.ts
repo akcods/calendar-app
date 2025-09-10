@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { CalendarEvent, CalendarGrid, DAYS } from '../../models/constants';
+import { CalendarEvent, CalendarGrid, DAYS, ModalMode } from '../../models/constants';
 import { EventService } from '../../services/event.service';
 import { EventModalComponent } from "../event-modal/event-modal.component";
 
@@ -19,7 +19,9 @@ export class CalendarComponent {
   selectedDate: string | null = null;
 
   modalEvents: CalendarEvent[] = [];
+  modalMode: ModalMode = ModalMode.Create;
   showModal = false;
+  selectedEvent: CalendarEvent | undefined = undefined;
 
   constructor(private eventService: EventService) { }
 
@@ -102,6 +104,7 @@ export class CalendarComponent {
   onDateClick(date: Date) {
     this.selectedDate = this.getFormattedDate(date);
     this.modalEvents = this.eventService.getEventsByDate(this.selectedDate);
+    this.modalMode = ModalMode.Create;
     this.showModal = true;
   }
 
@@ -112,20 +115,35 @@ export class CalendarComponent {
   onEventSave(event: CalendarEvent) {
     this.eventService.addEvent(event);
     this.onModalClose();
-    this.generateCalendar(); // Refresh view
-  }
-
-  onEventDelete(id: string) {
-    this.eventService.deleteEvent(id);
-    this.modalEvents = this.modalEvents.filter(e => e.id !== id);
     this.generateCalendar();
   }
 
-  onMoreEventsClick(arg0: Date) {
-    throw new Error('Method not implemented.');
+  onEventUpdate(event: CalendarEvent) {
+    this.eventService.updateEvent(event);
+    this.onModalClose();
+    this.generateCalendar();
   }
-  onEventClick(_t24: CalendarEvent) {
-    throw new Error('Method not implemented.');
+  
+  onEventDelete(id: string) {
+    this.eventService.deleteEvent(id);
+    this.showModal = false;
+    this.generateCalendar();
+  }
+
+  onEventClick(event: CalendarEvent) {
+    this.selectedDate = event.date;
+    this.selectedEvent = event;
+    this.modalEvents = [event];
+    this.modalMode = ModalMode.View;
+    this.showModal = true;
+  }
+
+  onMoreEventsClick(date: Date) {
+    this.selectedDate = this.getFormattedDate(date);
+    this.modalEvents = this.eventService.getEventsByDate(this.selectedDate);
+    this.selectedEvent = undefined;
+    this.modalMode = ModalMode.List;
+    this.showModal = true;
   }
 
   private getFormattedDate(date: Date) {
