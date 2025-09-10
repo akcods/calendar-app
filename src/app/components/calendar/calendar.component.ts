@@ -126,6 +126,7 @@ export class CalendarComponent {
   
   onEventDelete(id: string) {
     this.eventService.deleteEvent(id);
+    this.modalEvents = this.modalEvents.filter(e => e.id !== id);
     this.showModal = false;
     this.generateCalendar();
   }

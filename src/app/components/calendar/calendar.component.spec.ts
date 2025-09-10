@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CalendarComponent } from './calendar.component';
 import { By } from '@angular/platform-browser';
-import { CalendarEvent, DAYS } from '../../models/constants';
+import { CalendarEvent, DAYS, ModalMode } from '../../models/constants';
 import { EventService } from '../../services/event.service';
 import { EventModalComponent } from '../event-modal/event-modal.component';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
-  let eventService: jasmine.SpyObj<EventService>;
+  let eventServiceSpy: jasmine.SpyObj<EventService>;
 
   const sampleDate = new Date(2025, 8, 10);
   const formattedDate = '2025-09-10';
@@ -31,9 +31,9 @@ describe('CalendarComponent', () => {
 
     fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
-    eventService = TestBed.inject(EventService) as jasmine.SpyObj<EventService>;
+    eventServiceSpy = TestBed.inject(EventService) as jasmine.SpyObj<EventService>;
 
-    eventService.getEventsByDate.and.returnValue([sampleEvent]);
+    eventServiceSpy.getEventsByDate.and.returnValue([sampleEvent]);
     fixture.detectChanges();
   });
 
@@ -104,7 +104,7 @@ describe('CalendarComponent', () => {
     expect(component.selectedDate).toBe(formattedDate);
     expect(component.modalEvents.length).toBe(1);
     expect(component.showModal).toBeTrue();
-    expect(eventService.getEventsByDate).toHaveBeenCalledWith(formattedDate);
+    expect(eventServiceSpy.getEventsByDate).toHaveBeenCalledWith(formattedDate);
   });
 
   it('should close modal on onModalClose', () => {
@@ -119,7 +119,7 @@ describe('CalendarComponent', () => {
     component.showModal = true;
     component.onEventSave(newEvent);
 
-    expect(eventService.addEvent).toHaveBeenCalledWith(newEvent);
+    expect(eventServiceSpy.addEvent).toHaveBeenCalledWith(newEvent);
     expect(component.showModal).toBeFalse();
   });
 
@@ -127,7 +127,7 @@ describe('CalendarComponent', () => {
     component.modalEvents = [sampleEvent];
     component.onEventDelete(sampleEvent.id);
 
-    expect(eventService.deleteEvent).toHaveBeenCalledWith(sampleEvent.id);
+    expect(eventServiceSpy.deleteEvent).toHaveBeenCalledWith(sampleEvent.id);
     expect(component.modalEvents.length).toBe(0);
   });
 
@@ -149,5 +149,24 @@ describe('CalendarComponent', () => {
     const modalInstance = modalDebug.componentInstance as EventModalComponent;
     expect(modalInstance.selectedDate).toBe(formattedDate);
     expect(modalInstance.existingEvents).toEqual([sampleEvent]);
+  });
+
+  it('should open modal in view mode on event click', () => {
+    component.onEventClick(sampleEvent);
+
+    expect(component.selectedEvent).toEqual(sampleEvent);
+    expect(component.modalMode).toBe(ModalMode.View);
+    expect(component.showModal).toBeTrue();
+  });
+
+  it('should open modal in list mode on more events click', () => {
+    eventServiceSpy.getEventsByDate.and.returnValue([sampleEvent]);
+
+    const date = new Date(2025, 8, 10);
+    component.onMoreEventsClick(date);
+
+    expect(component.modalMode).toBe(ModalMode.List);
+    expect(component.modalEvents.length).toBe(1);
+    expect(component.showModal).toBeTrue();
   });
 });

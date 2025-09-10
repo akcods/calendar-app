@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EventModalComponent } from './event-modal.component';
-import { CalendarEvent, Categories } from '../../models/constants';
+import { CalendarEvent, Categories, ModalMode } from '../../models/constants';
+import { By } from '@angular/platform-browser';
 
 describe('EventModalComponent', () => {
   let component: EventModalComponent;
@@ -87,9 +88,32 @@ describe('EventModalComponent', () => {
     expect(component.close.emit).toHaveBeenCalled();
   });
 
+  it('should open event in View mode when openEvent is called', () => {
+    component.openEvent(sampleEvent);
+    expect(component.mode).toBe(ModalMode.View);
+    expect(component.selectedEvent).toEqual(sampleEvent);
+  });
+
+  it('should switch to View mode when clicking event in List mode', () => {
+    component.mode = ModalMode.List;
+    component.existingEvents = [sampleEvent];
+    fixture.detectChanges();
+
+    const li = fixture.debugElement.query(By.css('li'));
+    li.triggerEventHandler('click', null);
+
+    expect(component.mode).toBe(ModalMode.View);
+    expect(component.selectedEvent).toEqual(sampleEvent);
+  });
+
   it('should render existing events list', () => {
+    component.mode = ModalMode.List;
+    component.existingEvents = [sampleEvent];
+    fixture.detectChanges();
+
     const compiled = fixture.nativeElement as HTMLElement;
-    const listItems = compiled.querySelectorAll('.existing ul li');
+    const listItems = compiled.querySelectorAll('li');
+    
     expect(listItems.length).toBe(1);
     expect(listItems[0].textContent).toContain('Test Event');
   });
