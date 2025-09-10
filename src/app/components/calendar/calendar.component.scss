@@ -97,6 +97,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
+
+            &:hover {
+                color: black;
+            }
             
             &.more-events {
                 color: $emperor;
