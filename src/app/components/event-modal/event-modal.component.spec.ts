@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EventModalComponent } from './event-modal.component';
 import { CalendarEvent, Categories, ModalMode } from '../../models/constants';
-import { By } from '@angular/platform-browser';
 
 describe('EventModalComponent', () => {
   let component: EventModalComponent;
@@ -27,7 +26,6 @@ describe('EventModalComponent', () => {
     component = fixture.componentInstance;
 
     component.selectedDate = mockDate;
-    component.existingEvents = [sampleEvent];
     fixture.detectChanges();
   });
 
@@ -94,27 +92,45 @@ describe('EventModalComponent', () => {
     expect(component.selectedEvent).toEqual(sampleEvent);
   });
 
-  it('should switch to View mode when clicking event in List mode', () => {
-    component.mode = ModalMode.List;
-    component.existingEvents = [sampleEvent];
-    fixture.detectChanges();
+  it('should patch form and set mode to Update when editEvent is called', () => {
+    component.editEvent(sampleEvent);
 
-    const li = fixture.debugElement.query(By.css('li'));
-    li.triggerEventHandler('click', null);
-
-    expect(component.mode).toBe(ModalMode.View);
+    expect(component.mode).toBe(ModalMode.Update);
     expect(component.selectedEvent).toEqual(sampleEvent);
+    expect(component.form.value).toEqual({
+      title: sampleEvent.title,
+      description: sampleEvent.description,
+      category: sampleEvent.category
+    });
   });
 
-  it('should render existing events list', () => {
-    component.mode = ModalMode.List;
-    component.existingEvents = [sampleEvent];
-    fixture.detectChanges();
+  it('should emit updated event and reset form when updateEvent is called', () => {
+    const spyUpdate = spyOn(component.update, 'emit');
+    component.selectedEvent = { ...sampleEvent };
 
-    const compiled = fixture.nativeElement as HTMLElement;
-    const listItems = compiled.querySelectorAll('li');
-    
-    expect(listItems.length).toBe(1);
-    expect(listItems[0].textContent).toContain('Test Event');
+    // patch form values to simulate edit
+    component.form.patchValue({
+      title: 'Updated Title',
+      description: 'Updated Desc',
+      category: 'Personal'
+    });
+
+    component.updateEvent();
+
+    expect(spyUpdate).toHaveBeenCalled();
+    const emittedEvent = spyUpdate.calls.mostRecent().args[0] as CalendarEvent;
+
+    expect(emittedEvent.id).toBe(sampleEvent.id);
+    expect(emittedEvent.title).toBe('Updated Title');
+    expect(emittedEvent.description).toBe('Updated Desc');
+    expect(emittedEvent.category).toBe('Personal');
+    expect(emittedEvent.color).toBe(Categories.find(c => c.name === 'Personal')!.color);
+
+    expect(component.form.value).toEqual({
+      title: null,
+      description: null,
+      category: null
+    });
   });
+
 });

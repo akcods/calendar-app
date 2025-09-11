@@ -4,13 +4,14 @@ import { By } from '@angular/platform-browser';
 import { CalendarEvent, DAYS, ModalMode } from '../../models/constants';
 import { EventService } from '../../services/event.service';
 import { EventModalComponent } from '../event-modal/event-modal.component';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { of } from 'rxjs';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
   let eventServiceSpy: jasmine.SpyObj<EventService>;
 
-  const sampleDate = new Date(2025, 8, 10);
   const formattedDate = '2025-09-10';
   const sampleEvent: CalendarEvent = {
     id: '1',
@@ -22,7 +23,9 @@ describe('CalendarComponent', () => {
   };
 
   beforeEach(async () => {
-    const Spy = jasmine.createSpyObj('EventService', ['getEventsByDate', 'addEvent', 'deleteEvent']);
+    const Spy = jasmine.createSpyObj('EventService', ['getEventsByDate', 'addEvent', 'deleteEvent', 'updateEvent'], {
+      events$: of([sampleEvent])
+    });
 
     await TestBed.configureTestingModule({
       imports: [CalendarComponent, EventModalComponent],
@@ -98,15 +101,6 @@ describe('CalendarComponent', () => {
     expect(todayCell).toBeTruthy();
   });
 
-  it('shoulld open modal on date click and set modalEvents', () => {
-    component.onDateClick(sampleDate);
-
-    expect(component.selectedDate).toBe(formattedDate);
-    expect(component.modalEvents.length).toBe(1);
-    expect(component.showModal).toBeTrue();
-    expect(eventServiceSpy.getEventsByDate).toHaveBeenCalledWith(formattedDate);
-  });
-
   it('should close modal on onModalClose', () => {
     component.showModal = true;
     component.onModalClose();
@@ -123,32 +117,10 @@ describe('CalendarComponent', () => {
     expect(component.showModal).toBeFalse();
   });
 
-  it('should delete event and update modalEvents', () => {
-    component.modalEvents = [sampleEvent];
-    component.onEventDelete(sampleEvent.id);
-
-    expect(eventServiceSpy.deleteEvent).toHaveBeenCalledWith(sampleEvent.id);
-    expect(component.modalEvents.length).toBe(0);
-  });
-
   it('should format date correctly', () => {
     const date = new Date(2025, 0, 5); // 2025-01-05
     const formatted = (component as any).getFormattedDate(date);
     expect(formatted).toBe('2025-01-05');
-  });
-
-  it('should pass correct inputs to EventModalComponent', () => {
-    component.selectedDate = formattedDate;
-    component.modalEvents = [sampleEvent];
-    component.showModal = true;
-    fixture.detectChanges();
-
-    const modalDebug = fixture.debugElement.query(By.directive(EventModalComponent));
-    expect(modalDebug).toBeTruthy();
-
-    const modalInstance = modalDebug.componentInstance as EventModalComponent;
-    expect(modalInstance.selectedDate).toBe(formattedDate);
-    expect(modalInstance.existingEvents).toEqual([sampleEvent]);
   });
 
   it('should open modal in view mode on event click', () => {
@@ -159,14 +131,95 @@ describe('CalendarComponent', () => {
     expect(component.showModal).toBeTrue();
   });
 
-  it('should open modal in list mode on more events click', () => {
-    eventServiceSpy.getEventsByDate.and.returnValue([sampleEvent]);
+  it('onDateClick should set selectedDate, modalMode and showModal', () => {
+    const date = new Date('2025-09-11');
+    component.onDateClick(date);
 
-    const date = new Date(2025, 8, 10);
-    component.onMoreEventsClick(date);
-
-    expect(component.modalMode).toBe(ModalMode.List);
-    expect(component.modalEvents.length).toBe(1);
+    expect(component.selectedDate).toBe('2025-09-11');
+    expect(component.modalMode).toBe(ModalMode.Create);
     expect(component.showModal).toBeTrue();
   });
+
+  it('onSearch should update searchQuery and call searchQuerySubject.next', () => {
+    const spyNext = spyOn(component['searchQuerySubject'], 'next');
+    const event = { target: { value: 'meet' } } as unknown as Event;
+
+    component.onSearch(event);
+
+    expect(component.searchQuery).toBe('meet');
+    expect(spyNext).toHaveBeenCalledWith('meet');
+  });
+
+  it('onEventUpdate should call service, close modal and regenerate calendar', () => {
+    spyOn(component, 'onModalClose');
+    component.onEventUpdate(sampleEvent);
+
+    expect(eventServiceSpy.updateEvent).toHaveBeenCalledWith(sampleEvent);
+    expect(component.onModalClose).toHaveBeenCalled();
+  });
+
+  it('onEventDelete should call service, hide modal and regenerate calendar', () => {
+    component.onEventDelete(sampleEvent.id);
+
+    expect(eventServiceSpy.deleteEvent).toHaveBeenCalledWith(sampleEvent.id);
+    expect(component.showModal).toBeFalse();
+  });
+
+  it('onEventDrop should update event with new date and regenerate calendar', () => {
+    spyOn(component, 'toggleExpanded');
+
+    const dropEvent = {
+      item: { data: sampleEvent },
+      event: {
+        target: { closest: () => ({ getAttribute: () => '2025-09-15' }) }
+      }
+    } as unknown as CdkDragDrop<CalendarEvent[]>;
+
+    component.onEventDrop(dropEvent);
+
+    expect(eventServiceSpy.updateEvent).toHaveBeenCalledWith({
+      ...sampleEvent,
+      date: '2025-09-15'
+    });
+    expect(component.toggleExpanded).toHaveBeenCalledWith(null);
+  });
+
+  it('onEventDrop should return early if no targetDate', () => {
+    const dropEvent = {
+      item: { data: sampleEvent },
+      event: { target: { closest: () => null } }
+    } as unknown as CdkDragDrop<CalendarEvent[]>;
+
+    component.onEventDrop(dropEvent);
+
+    expect(eventServiceSpy.updateEvent).not.toHaveBeenCalled();
+  });
+
+  it('filterEvents should clear results if query is empty', () => {
+    component['filterEvents']('');
+    expect(component.searchResults.length).toBe(0);
+  });
+
+  it('filterEvents should filter events by title, description or category', () => {
+    // Arrange
+    eventServiceSpy.events$ = of([sampleEvent]); // ensure observable
+
+    // Act
+    component['filterEvents']('event');
+
+    // Assert
+    expect(component.searchResults.length).toBe(1);
+    expect(component.searchResults[0].title).toBe('Test Event');
+  });
+
+  it('toggleExpanded should set formatted date when date provided', () => {
+    component.toggleExpanded(new Date('2025-09-20'));
+    expect(component.expandedDate).toBe('2025-09-20');
+  });
+
+  it('toggleExpanded should clear expandedDate when null passed', () => {
+    component.toggleExpanded(null);
+    expect(component.expandedDate).toBeNull();
+  });
+
 });
