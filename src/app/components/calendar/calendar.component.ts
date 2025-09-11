@@ -30,11 +30,7 @@ export class CalendarComponent {
 
   constructor(public eventService: EventService) {
     this.searchQuerySubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe(searchValue => {
-      if (searchValue.trim().length > 0) {
-        this.searchResults = this.filterEvents(searchValue);
-      } else {
-        this.searchResults = [];
-      }
+      this.filterEvents(searchValue);
     });
   }
 
@@ -182,17 +178,20 @@ export class CalendarComponent {
     this.generateCalendar();
   }
 
-  private filterEvents = (query: string): CalendarEvent[] => {
+  private filterEvents(query: string) {
     if (!query || query.trim().length === 0) {
-      return [];
+      this.searchResults = [];
+    } else {
+      const lowerQuery = query.toLowerCase();
+      this.eventService.events$.subscribe((events) => {
+        this.searchResults = events.filter(e =>
+          e.title.toLowerCase().includes(lowerQuery) ||
+          e.description?.toLowerCase().includes(lowerQuery) ||
+          e.category.toLowerCase().includes(lowerQuery)
+        );
+      });
     }
 
-    const lowerQuery = query.toLowerCase();
-    return this.eventService.events.filter(e =>
-      e.title.toLowerCase().includes(lowerQuery) ||
-      e.description?.toLowerCase().includes(lowerQuery) ||
-      e.category.toLowerCase().includes(lowerQuery)
-    );
   };
 
   private getFormattedDate(date: Date) {
