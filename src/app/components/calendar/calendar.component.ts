@@ -16,11 +16,11 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 export class CalendarComponent {
 
   currentDate = new Date();
+  expandedDate: string | null = null;
   weeks: CalendarGrid[][] = [];
   Days: string[] = DAYS;
   selectedDate: string | null = null;
 
-  modalEvents: CalendarEvent[] = [];
   modalMode: ModalMode = ModalMode.Create;
   showModal = false;
   selectedEvent: CalendarEvent | undefined = undefined;
@@ -117,7 +117,6 @@ export class CalendarComponent {
 
   onDateClick(date: Date) {
     this.selectedDate = this.getFormattedDate(date);
-    this.modalEvents = this.eventService.getEventsByDate(this.selectedDate);
     this.modalMode = ModalMode.Create;
     this.showModal = true;
   }
@@ -145,7 +144,6 @@ export class CalendarComponent {
 
   onEventDelete(id: string) {
     this.eventService.deleteEvent(id);
-    this.modalEvents = this.modalEvents.filter(e => e.id !== id);
     this.showModal = false;
     this.generateCalendar();
   }
@@ -153,16 +151,7 @@ export class CalendarComponent {
   onEventClick(event: CalendarEvent) {
     this.selectedDate = event.date;
     this.selectedEvent = event;
-    this.modalEvents = [event];
     this.modalMode = ModalMode.View;
-    this.showModal = true;
-  }
-
-  onMoreEventsClick(date: Date) {
-    this.selectedDate = this.getFormattedDate(date);
-    this.modalEvents = this.eventService.getEventsByDate(this.selectedDate);
-    this.selectedEvent = undefined;
-    this.modalMode = ModalMode.List;
     this.showModal = true;
   }
 
@@ -177,6 +166,7 @@ export class CalendarComponent {
     updatedEvent.date = targetDate.toString();
     this.eventService.updateEvent(updatedEvent);
     this.generateCalendar();
+    this.toggleExpanded(null);
   }
 
   private filterEvents(query: string) {
@@ -195,7 +185,11 @@ export class CalendarComponent {
 
   };
 
-  private getFormattedDate(date: Date) {
+  toggleExpanded(date: Date | null) {
+    this.expandedDate = date ? this.getFormattedDate(date) : null;
+  }
+
+  getFormattedDate(date: Date) {
     const DatePadStartLength = 2;
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(DatePadStartLength, '0')}-${date.getDate().toString().padStart(DatePadStartLength, '0')}`;
   }

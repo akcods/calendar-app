@@ -32,5 +32,4 @@ export enum ModalMode {
   Create = 'create',
   View = 'view',
   Update = 'update',
-  List = 'list'
 }

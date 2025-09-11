@@ -16,7 +16,6 @@ export class EventModalComponent {
   @Input() mode: ModalMode = ModalMode.Create;
   @Input() selectedDate!: string;
   @Input() selectedEvent?: CalendarEvent;
-  @Input() existingEvents: CalendarEvent[] = [];
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<CalendarEvent>();
@@ -32,10 +31,6 @@ export class EventModalComponent {
     description: [''],
     category: ['Work', Validators.required],
   });
-
-  selectEvent(event: CalendarEvent) {
-    this.selectedEvent = { ...event };
-  }
 
   onSubmit() {
     if (this.form.invalid) return;

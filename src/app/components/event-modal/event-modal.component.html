@@ -40,16 +40,4 @@
             <button class="danger" (click)="onDelete(selectedEvent.id)">Delete</button>
         </div>
     </ng-container>
-
-    <ng-container *ngIf="mode === modalMode.List && existingEvents.length">
-        <h3>Events on {{ selectedDate }}</h3>
-        <ul>
-            <li *ngFor="let event of existingEvents" (click)="openEvent(event)">
-                <span [style.color]="event.color">{{ event.title }}</span> ({{ event.category }})
-            </li>
-        </ul>
-        <div class="actions">
-            <button class="secondary" (click)="closeModal()">Close</button>
-        </div>
-    </ng-container>
 </div>
