@@ -4,11 +4,12 @@ import { CalendarEvent, CalendarGrid, DAYS, ModalMode } from '../../models/const
 import { EventService } from '../../services/event.service';
 import { EventModalComponent } from "../event-modal/event-modal.component";
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, EventModalComponent],
+  imports: [CommonModule, EventModalComponent, DragDropModule],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss'
 })
@@ -39,6 +40,10 @@ export class CalendarComponent {
 
   ngOnInit() {
     this.generateCalendar();
+  }
+
+  getDropListId(date: Date): string {
+    return this.getFormattedDate(date);
   }
 
   private generateCalendar() {
@@ -162,6 +167,19 @@ export class CalendarComponent {
     this.selectedEvent = undefined;
     this.modalMode = ModalMode.List;
     this.showModal = true;
+  }
+
+  onEventDrop(event: CdkDragDrop<CalendarEvent[]>) {
+    const eventData: CalendarEvent = event.item.data;
+    const targetElement = (event.event.target as HTMLElement).closest('.day-cell') as HTMLElement;
+    const targetDate = targetElement?.getAttribute('data-date');
+
+    if (!targetDate) return;
+
+    const updatedEvent = { ...eventData };
+    updatedEvent.date = targetDate.toString();
+    this.eventService.updateEvent(updatedEvent);
+    this.generateCalendar();
   }
 
   private filterEvents = (query: string): CalendarEvent[] => {

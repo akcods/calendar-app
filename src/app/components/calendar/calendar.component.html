@@ -24,19 +24,21 @@
 
 </div>
 
-<div class="calendar-grid">
+<div class="calendar-grid" cdkDropListGroup>
     <div class="day-name" *ngFor="let day of Days">
         {{ day }}
     </div>
 
     <ng-container *ngFor="let week of weeks">
         <div class="day-cell" *ngFor="let day of week" [class.other-month]="!day.isCurrentMonth"
-            [class.today]="day.isToday" (click)="onDateClick(day.date)">
+            [class.today]="day.isToday" [attr.data-date]="getDropListId(day.date)" (click)="onDateClick(day.date)"
+            cdkDropList [cdkDropListData]="day.events" (cdkDropListDropped)="onEventDrop($event)">
             <div class="day-number">{{ day.date.getDate() }} </div>
 
             <!-- show upto 2 events -->
             <div class="event" *ngFor="let event of day.events | slice:0:2" [style.backgroundColor]="event.color"
-                (click)="$event.stopPropagation(); onEventClick(event)">{{event.title}}</div>
+                (click)="$event.stopPropagation(); onEventClick(event)" cdkDrag [cdkDragData]="event">{{event.title}}
+            </div>
 
             <!-- show "+X more" if more than 2 events -->
             <div class="more-events event" *ngIf="day.events.length > 2"
