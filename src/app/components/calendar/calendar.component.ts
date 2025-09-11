@@ -24,6 +24,7 @@ export class CalendarComponent {
   modalMode: ModalMode = ModalMode.Create;
   showModal = false;
   selectedEvent: CalendarEvent | undefined = undefined;
+  searchQuery: string = "";
   searchResults: CalendarEvent[] = [];
 
   private searchQuerySubject: Subject<string> = new Subject<string>();
@@ -122,8 +123,8 @@ export class CalendarComponent {
   }
 
   onSearch(event: Event) {
-    const searchQuery = (event.target as HTMLInputElement).value;
-    this.searchQuerySubject.next(searchQuery);
+    this.searchQuery = (event.target as HTMLInputElement).value.trim();
+    this.searchQuerySubject.next(this.searchQuery);
   }
 
   onModalClose() {
