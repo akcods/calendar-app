@@ -1,27 +1,61 @@
-# CalendarApp
+# 📅 Angular Calendar App
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+A feature-rich **calendar application** built with Angular, supporting event creation, editing, drag & drop rescheduling, search & filter, and multiple views for seamless event management.
 
-## Development server
+---
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 🚀 Features
 
-## Code scaffolding
+- ✅ Create, update, delete events  
+- ✅ Categorize events with colors (Work, Personal, Important)  
+- ✅ Drag & drop events across dates for rescheduling  
+- ✅ Expandable day view with scroll for more than 2 events  
+- ✅ Event modal for quick view, edit, and delete
+- ✅ Search and filter events by title, description, or category
+- ✅ Responsive design with Angular CDK drag-drop  
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+---
 
-## Build
+## 📦 Installation Guide
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Prerequisites
+- **Node.js**: `>= 18.x`  
+- **Angular CLI**: `>= 17.x`  
+- **npm**: `>= 9.x`
 
-## Running unit tests
+### Clone Repository
+```bash
+git clone https://github.com/akcods/calendar-app.git
+cd calendar-app
+```
+### Install Dependencies
+    npm install
+### Start Development Server
+    ng serve
+### 🧪 Running Unit Tests
+    ng test
+### Code Coverage
+    ng test --code-coverage
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+# 📊 Tech Stack
 
-## Running end-to-end tests
+    - Angular 17 (framework)
+    - Angular CDK (drag & drop)
+    - RxJS (state management & search debounce)
+    - TypeScript
+    - Jasmine/Karma (testing framework)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+# 🌐 Live Demo
+[Calendar app](https://akcods.github.io)
 
-## Further help
+# 📖 Usage Notes
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+    Click on any date cell to add a new event
+
+    Click on an event to view/edit/delete
+
+    If there are more than 2 events on a day, click +X more to expand and view them
+
+    Drag an event to another day cell to reschedule
+
+    Use the search bar to filter events dynamically
